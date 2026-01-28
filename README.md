@@ -1,132 +1,171 @@
-🌍 QuakeWatch — Global Earthquake Monitoring Dashboard
+# 🌍 QuakeWatch — Global Earthquake Monitoring Dashboard
 
-QuakeWatch is a full-stack web application that provides a real-time view of global earthquake activity using authoritative data from the USGS Earthquake Hazards Program.
+**QuakeWatch** is a full-stack web application that provides a real-time view of worldwide earthquake activity using authoritative data from the **USGS Earthquake Hazards Program**.
 
-Beyond the UI, this project was intentionally built to demonstrate production-grade QA automation, including Selenium UI testing, resilient test design for live data, and CI-ready reporting.
+Beyond the UI, this project was intentionally built to demonstrate **production-grade QA automation**, including Selenium UI testing, resilient test design for live data, and CI-ready reporting.
 
-🎯 Project Goals
+---
 
-Present live, worldwide earthquake data in a clear, government-style dashboard
+## 🎯 Project Goals
 
-Support filtering by time window, minimum magnitude, and result limits
+- Present **live, global earthquake data** in a clear, government-style dashboard  
+- Support filtering by **time window**, **minimum magnitude**, and **result limits**  
+- Demonstrate **real-world UI automation** against a React application with dynamic data  
+- Build a QA suite that is **stable, maintainable, and CI-ready** — not demo-only  
 
-Demonstrate real-world UI automation against a React application with dynamic data
+---
 
-Build a QA suite that is stable, maintainable, and CI-ready, not demo-only
+## 🧱 System Architecture
 
-🧱 System Architecture
 [ React + Vite UI ]
-          ↓
+↓
 [ FastAPI Backend ]
-          ↓
+↓
 [ USGS Earthquake API ]
 
 
-QA Automation:
+### QA Automation Flow
 
 Selenium (UI)
-  ├─ Page Object Model (POM)
-  ├─ Explicit waits (loading / empty / error states)
-  ├─ React re-render & stale-element handling
-  ├─ HTML reports + screenshots
-  └─ CI-ready (headless execution)
+├─ Page Object Model (POM)
+├─ Explicit waits (loading / empty / error states)
+├─ React re-render & stale-element handling
+├─ HTML reports + screenshots
+└─ CI-ready (headless execution)
 
-🖥️ Frontend
 
-Tech
+---
 
-React
+## 🖥️ Frontend
 
-TypeScript
+### Tech Stack
+- React  
+- TypeScript  
+- Vite  
+- CSS Modules  
 
-Vite
+### Features
+- Full-page, public-sector-style dashboard  
+- Filter controls (time window, min magnitude, limit)  
+- Empty state handling (no results)  
+- Modal detail view for each earthquake  
+- Stable `data-testid` attributes for automation  
 
-CSS Modules
+---
 
-Features
+## ⚙️ Backend
 
-Full-page, public-sector-style dashboard
+### Tech Stack
+- FastAPI  
+- Python  
+- Axios (frontend client)  
 
-Filter controls (time window, min magnitude, limit)
+### Responsibilities
+- Acts as a validation layer between UI and USGS  
+- Normalizes earthquake data  
+- Handles query parameters (`window`, `minMag`, `limit`)  
+- Enables CORS for browser-based clients  
 
-Empty state handling (no results)
+---
 
-Modal detail view for each earthquake
+## 🧪 QA Automation (Key Focus)
 
-Stable data-testid attributes for automation
+This project intentionally goes **beyond basic Selenium scripts**.
 
-⚙️ Backend
+### Tools
+- Selenium WebDriver  
+- Pytest  
+- Pytest-HTML  
+- Chrome (headless & headed modes)  
 
-Tech
+### Design Patterns & Practices
+- Page Object Model (POM)  
+- Explicit waits only (no implicit waits)  
+- Resilient selectors using `data-testid`  
+- Safe handling of:
+  - Loading states  
+  - Empty result states  
+  - React re-renders (stale elements)  
+  - Live / non-deterministic data  
 
-FastAPI
+---
 
-Python
+## ✅ Test Coverage
 
-Axios (frontend client)
+### Smoke Tests
+- Application loads successfully  
+- Data table renders  
+- Modal opens and closes correctly  
 
-Responsibilities
+### Regression Tests
+- Minimum magnitude filter enforced  
+- Supports valid empty results (real-world data behavior)  
 
-Acts as a validation layer between UI and USGS
+---
 
-Normalizes earthquake data
+## 📊 Reporting
 
-Handles query parameters (window, minMag, limit)
+- Self-contained HTML test reports  
+- Automatic screenshots on failure  
+- CI artifact-ready output  
 
-Enables CORS for browser-based clients
+---
 
-🧪 QA Automation (Key Focus)
+## ▶️ Running the Project Locally
 
-This project intentionally goes beyond “basic Selenium scripts”.
+### Backend
+```bash
+cd apps/api
+python -m venv .venv
+source .venv/bin/activate   # Windows: .\.venv\Scripts\activate
+pip install -r requirements.txt
+uvicorn main:app --port 8000
+Frontend
+cd apps/web
+npm install
+npm run dev
+📍 Frontend runs at:
+http://localhost:5173
 
-Tools
+🧪 Running UI Tests
+cd quakewatch
+python -m pytest -q --html=artifacts/report.html --self-contained-html
+Artifacts Generated
+artifacts/report.html
 
-Selenium WebDriver
+artifacts/screenshots/ (on failure)
 
-Pytest
+🚀 CI / Automation
+The project is CI-ready and designed to run Selenium in headless mode using GitHub Actions:
 
-Pytest-HTML
+Starts backend and frontend services
 
-Chrome (headless & headed modes)
+Executes Selenium UI tests
 
-Design Patterns
+Uploads HTML reports and logs as artifacts
 
-Page Object Model (POM)
+📁 Workflow location:
+.github/workflows/
 
-Explicit waits only (no implicit waits)
+📌 Why This Project Matters
+QuakeWatch demonstrates:
 
-Resilient selectors (data-testid)
+Full-stack understanding (frontend + backend)
 
-Safe handling of:
+Real-world QA automation (not toy examples)
 
-Loading states
+Testing against live, changing data
 
-Empty result states
+Thoughtful handling of UI edge cases
 
-React re-renders (stale elements)
+Production-minded engineering practices
 
-Live / non-deterministic data
+This is not a tutorial project — it reflects how modern teams build and test real systems.
 
-Test Coverage
+👤 Author
+Mehmet Yazdkhasti
+Software Engineer / QA Automation
+Focused on building reliable systems with strong testing foundations
 
-Smoke Test
 
-Application loads
-
-Data table renders
-
-Modal opens and closes correctly
-
-Regression Test
-
-Minimum magnitude filter enforced
-
-Supports valid empty results (real-world data behavior)
-
-Reporting
-
-Self-contained HTML test reports
-
-Automatic screenshots on failure
-
-CI artifact-ready output
+---
