@@ -1,0 +1,91 @@
+name: UI Tests (Selenium)
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+
+jobs:
+  ui-tests:
+    runs-on: ubuntu-latest
+
+    services:
+      api:
+        image: python:3.12-slim
+        ports:
+          - 8000:8000
+        options: >-
+          --health-cmd "python -c 'import socket; s=socket.socket(); s.connect((\"127.0.0.1\",8000)); s.close()' || exit 1"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # ---------- API ----------
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install API deps
+        working-directory: apps/api
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Start API (background)
+        working-directory: apps/api
+        run: |
+          nohup python -m uvicorn main:app --host 0.0.0.0 --port 8000 > api.log 2>&1 &
+          sleep 2
+
+      - name: Check API is up
+        run: |
+          curl -sSf http://127.0.0.1:8000/health || (echo "API health failed" && exit 1)
+
+      # ---------- Web ----------
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install web deps
+        working-directory: apps/web
+        run: npm ci
+
+      - name: Start web (background)
+        working-directory: apps/web
+        run: |
+          nohup npm run dev -- --host 0.0.0.0 --port 5173 > web.log 2>&1 &
+          sleep 2
+
+      - name: Check web is up
+        run: |
+          curl -sSf http://127.0.0.1:5173/ || (echo "Web failed" && exit 1)
+
+      # ---------- UI Tests ----------
+      - name: Install UI test deps
+        run: |
+          python -m pip install -r tests/ui/requirements.txt || true
+          python -m pip install selenium pytest pytest-html
+
+      - name: Run Selenium tests (headless)
+        env:
+          HEADLESS: "1"
+        run: |
+          mkdir -p artifacts
+          python -m pytest -q --html=artifacts/report.html --self-contained-html
+
+      # ---------- Upload artifacts ----------
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-test-artifacts
+          path: |
+            artifacts/**
+            apps/api/api.log
+            apps/web/web.log
